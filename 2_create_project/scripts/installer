@@ -1,0 +1,167 @@
+#!/bin/sh
+
+# Package
+PACKAGE="gogs"
+DNAME="Gogs"
+
+INSTALL_DIR="/usr/local/${PACKAGE}"
+SSS="/var/packages/${DNAME}/scripts/start-stop-status"
+PATH="${INSTALL_DIR}:${PATH}"
+
+SERVICETOOL="/usr/syno/bin/servicetool"
+FWPORTS="/var/packages/${DNAME}/scripts/${PACKAGE}.sc"
+
+FILE_CREATE_LOG="${INSTALL_DIR}/gogs/wizard_create_log"
+LOG_FILE="/var/log/gogs.log"
+
+
+CONF_DIR="${INSTALL_DIR}/gogs/custom/conf"
+DATA_DIR="${INSTALL_DIR}/gogs/data"
+SETTING_FILE="${INSTALL_DIR}/gogs/custom/conf/app.ini"
+
+BACKUP_DIR="/tmp/gogs_backup"
+
+BACKUP_GITIG="tmp/gitignore"
+BACKUP_LABEL="/tmp/label"
+BACKUP_LICENSE="tmp/license"
+BACKUP_README="tmp/readme"
+BACKUP_AVATARS="/tmp/avatars"
+BACKUP_ATTACH="/tmp/attachments"
+
+LABEL_DIR="${CONF_DIR}/label"
+LICENSE_DIR="${CONF_DIR}/license"
+GITIGNORE_DIR="${CONF_DIR}/gitignore"
+README_DIR="${CONF_DIR}/readme"
+AVATARS_DIR="${INSTALL_DIR}/gogs/data/avatars/"
+ATTACH_DIR="${INSTALL_DIR}/gogs/data/attachments/"
+
+preinst ()
+{
+    touch ${FILE_CREATE_LOG}
+    if [[ -f "${SETTING_FILE}" ]]; then
+        cp "${SETTING_FILE}" /tmp/gogs_app.ini
+    fi
+    
+    exit 0
+}
+
+postinst ()
+{
+    # Link
+    ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
+
+    # to create log at each start 
+    if [ "${wizard_create_log}" == "true" ]; then
+        touch ${FILE_CREATE_LOG}
+    fi
+    # Add firewall config
+    ${SERVICETOOL} --install-configure-file --package ${FWPORTS} >> /dev/null
+
+    if [[ -f "/tmp/gogs_app.ini" ]]; then
+        mkdir -p "${INSTALL_DIR}/gogs/custom/conf"
+        mv "/tmp/gogs_app.ini" ${SETTING_FILE}
+    fi
+    
+    exit 0
+}
+
+preuninst ()
+{
+    # Stop the package
+    ${SSS} stop > /dev/null
+    # Remove firewall config
+    if [ "${SYNOPKG_PKG_STATUS}" == "UNINSTALL" ]; then
+        ${SERVICETOOL} --remove-configure-file --package ${PACKAGE}.sc >> /dev/null
+    fi
+
+    exit 0
+}
+
+postuninst ()
+{
+    # Remove link
+    rm -f ${INSTALL_DIR}
+
+    # remove log file
+    rm -f ${LOG_FILE}
+
+    exit 0
+}
+
+preupgrade ()
+{
+    # Stop the package
+    ${SSS} stop > /dev/null
+    
+    if [[ -f "${SETTING_FILE}" ]]; then
+        cp "${SETTING_FILE}" /tmp/gogs_app.ini
+    fi
+
+    #Label
+    if [[ -d "${LABEL_DIR}" ]]; then
+        mv -f "${LABEL_DIR}" /tmp
+    fi
+      
+    #gitignore
+    if [[ -d "${GITIGNORE_DIR}" ]]; then
+        mv -f "${GITIGNORE_DIR}" /tmp
+    fi
+    
+    #license
+    if [[ -d "${LICENSE_DIR}" ]]; then
+        mv -f "${LICENSE_DIR}" /tmp
+    fi
+
+    #readme
+    if [[ -d "${README_DIR}" ]]; then
+        mv -f "${README_DIR}" /tmp
+    fi
+
+    #avatars
+    if [[ -d "${AVATARS_DIR}" ]]; then
+        mv -f "${AVATARS_DIR}" /tmp
+    fi
+    #attachments
+    if [[ -d "${ATTACH_DIR}" ]]; then
+        mv -f "${ATTACH_DIR}" /tmp
+    fi
+    exit 0
+}
+
+postupgrade ()
+{
+    #echo $(date)  "postupgrade" >> "${LOG_FILE}"
+    if [[ -f "/tmp/gogs_app.ini" ]]; then
+        mkdir -p "${INSTALL_DIR}/gogs/custom/conf"
+        mv "/tmp/gogs_app.ini" ${SETTING_FILE}
+    fi
+    if [[ -d "${BACKUP_LABEL}" ]]; then
+        mv -f "${BACKUP_LABEL}" "${CONF_DIR}"
+    fi
+
+    if [[ -d "${BACKUP_GITIG}" ]]; then
+       mv -f "${BACKUP_GITIG}" "${CONF_DIR}"
+    fi
+
+    if [[ -d "${BACKUP_LICENSE}" ]]; then
+        mv -f "${BACKUP_LICENSE}" "${CONF_DIR}"
+    fi
+
+    if [[ -d "${BACKUP_README}" ]]; then
+        mv -f "${BACKUP_README}" "${CONF_DIR}"
+    fi
+
+    if [[ ! -d "${DATA_DIR}" ]]; then
+        mkdir -p "${DATA_DIR}"
+    fi
+
+    if [[ -d "${BACKUP_AVATARS}" ]]; then
+        mv -f "${BACKUP_AVATARS}" "${DATA_DIR}"
+    fi
+
+    if [[ -d "${BACKUP_ATTACH}" ]]; then
+        mv -f "${BACKUP_ATTACH}" "${DATA_DIR}"
+        #echo $(date)  "Copy ${BACKUP_ATTACH} to ${DATA_DIR}" >> "${LOG_FILE}"
+    fi
+    exit 0
+}
