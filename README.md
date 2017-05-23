@@ -1,6 +1,6 @@
-# gogs-spk
+# gogs-synology
 
-[Gogs](https://gogs.io) (Go Git Service) SPK package ([Synology PacKages](https://www.synology.com/en-us/dsm/app_packages))
+[Gogs](https://gogs.io) (Go Git Service) SPK package ([Synology Packages](https://www.synology.com/en-us/dsm/app_packages))
 
 Install Gogs into a Synology NAS.
 
@@ -8,7 +8,7 @@ Install Gogs into a Synology NAS.
 
 <sub>this package, to see Gogs requirements check https://gogs.io</sub>
 
-* armv7 (Tested only with DS213j, Marvell Armada 370)
+* armv7 (DS213j, DS211j, Marvell Armada 370) 
 * intel Atom D2700 (RS2414rp+)
 * intel Atom CE5335 (DS214 play)
 * MariaDB, SQLite
@@ -43,10 +43,7 @@ GOOS=linux GOARCH=arm GOARM=7 go get -u github.com/gogits/gogs
 
 ![Install](screenshots/install.png)
 
-![Stopping](screenshots/stopping.png)
-
-![Desktop icon](screenshots/icon.png)
-
+![Install](screenshots/started.png)
 
 Gogs screenshots
 https://github.com/gogits/gogs
@@ -55,5 +52,6 @@ https://github.com/gogits/gogs
 ## ToDo
 
 - Don't force to use Git Server and MariaDB (PostgreSQL? Gogs ARM version haven't Sqlite/TiDB)
+- Create gogs db on MySQL on first installation
 - Support to archs (and DBs)
 - Don't use **root** user and create and use **gogs** user, if possible
