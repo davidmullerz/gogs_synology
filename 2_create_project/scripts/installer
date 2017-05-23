@@ -135,18 +135,23 @@ postupgrade ()
         mkdir -p "${INSTALL_DIR}/gogs/custom/conf"
         mv "/tmp/gogs_app.ini" ${SETTING_FILE}
     fi
+
+    #Label
     if [[ -d "${BACKUP_LABEL}" ]]; then
         mv -f "${BACKUP_LABEL}" "${CONF_DIR}"
     fi
 
+    #gitignore
     if [[ -d "${BACKUP_GITIG}" ]]; then
        mv -f "${BACKUP_GITIG}" "${CONF_DIR}"
     fi
 
+    #license
     if [[ -d "${BACKUP_LICENSE}" ]]; then
         mv -f "${BACKUP_LICENSE}" "${CONF_DIR}"
     fi
 
+    #readme
     if [[ -d "${BACKUP_README}" ]]; then
         mv -f "${BACKUP_README}" "${CONF_DIR}"
     fi
@@ -154,11 +159,13 @@ postupgrade ()
     if [[ ! -d "${DATA_DIR}" ]]; then
         mkdir -p "${DATA_DIR}"
     fi
-
+    
+    #avatars
     if [[ -d "${BACKUP_AVATARS}" ]]; then
         mv -f "${BACKUP_AVATARS}" "${DATA_DIR}"
     fi
-
+    
+    #attachments
     if [[ -d "${BACKUP_ATTACH}" ]]; then
         mv -f "${BACKUP_ATTACH}" "${DATA_DIR}"
         #echo $(date)  "Copy ${BACKUP_ATTACH} to ${DATA_DIR}" >> "${LOG_FILE}"
