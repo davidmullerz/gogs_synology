@@ -1,5 +1,5 @@
 package="Gogs"
-version="0.11.19"
+version="0.11.43"
 description="A painless self-hosted Git service"
 support_url="https://discuss.gogs.io/"
 displayname="Gogs"
